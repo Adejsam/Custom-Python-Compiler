@@ -320,7 +320,7 @@ class CodeGenerator:
         """Enhanced expression handling"""
         if isinstance(node, tuple):
             if len(node) == 3:  # Binary operations
-                if node[0] in ['+', '-', '*', '/', '==', '!=', '>', '>=', '<', '<=']:
+                if node[0] in ['+', '-', '*', '/', '==', '!=', '>', '>=', '<', '<=', '**', '^']:
                     return self.visit_binop(node)
             elif len(node) == 2:  # Unary operations
                 if node[0] in ['-', 'not']:
@@ -356,8 +356,18 @@ class CodeGenerator:
             return self.builder.fmul(left_val, right_val)
         elif op == '/':
             return self.builder.fdiv(left_val, right_val)
-        
-        return None
+        elif op == '**' or op == '^':
+            # Create function type for pow (double precision)
+            pow_func_type = ir.FunctionType(ir.DoubleType(), [ir.DoubleType(), ir.DoubleType()])
+            
+            # Add the function to the module if it doesn't exist
+            if 'pow' not in self.module.globals:
+                pow_func = ir.Function(self.module, pow_func_type, 'pow')
+            else:
+                pow_func = self.module.globals['pow']
+            
+            # Call the pow function
+            return self.builder.call(pow_func, [left_val, right_val])
 
     def visit_comparison(self, node):
         """Comparison operator handling"""

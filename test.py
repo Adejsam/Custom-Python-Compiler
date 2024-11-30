@@ -7,9 +7,12 @@ from code_generator import execute_ir
 data = '''#test
 print("hello")
 a = input("Enter a number:")
-print(a+1)
+print(a)
 
-if a == 2: print("yh") else: print("done") 
+if a == 2: 
+    print("yh") 
+else: 
+    print("done") 
 
 for i in range(1, 10): 
     print(i)
