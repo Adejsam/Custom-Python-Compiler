@@ -5,17 +5,34 @@ from code_generator import execute_ir
 
 # Test data with fixed string literals
 data = '''#test
-print("hello")
-a = input("Enter a number:")
-print(a)
 
-if a == 2: 
-    print("yh") 
-else: 
-    print("done") 
+cit_lab_x = 0
+stadium_x = 7
+cit_lab_y = 0
+stadium_y = 10
+number_of_students = 90
 
-for i in range(1, 10): 
-    print(i)
+stride_length = 0.75
+
+distance = (((stadium_x - cit_lab_x) ** 2) + ((stadium_y - cit_lab_y) ** 2)) ** 0.5
+
+steps_per_student = distance / stride_length
+
+total_steps = steps_per_student * number_of_students
+
+average_steps = total_steps / number_of_students
+
+print("Total distance in meteres:")
+print(distance)
+
+print("Estimated steps per student:")
+print(steps_per_student)
+
+print("Total steps walked:")
+print(total_steps)
+
+print("Average number of steps for any student:")
+print(average_steps)
 '''
 
 # Build lexer
