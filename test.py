@@ -1,7 +1,8 @@
 import lexer
 from parser import parser
-from ir_generator import compile_code
-from code_generator import execute_ir
+from code_generator import compile_code
+from code_executor import execute_ir
+from semantic_analyzer import SemanticAnalyzer
 
 # Test data with fixed string literals
 data = '''#test
@@ -10,7 +11,7 @@ cit_lab_x = 0
 stadium_x = 7
 cit_lab_y = 0
 stadium_y = 10
-number_of_students = 90
+number_of_students = input("Enter the number of students:")
 
 stride_length = 0.75
 
@@ -46,14 +47,20 @@ while True:
 # Parse the input data
 result = parser.parse(data)
 
-print("==============================")
-print(f"Parse Result: {result}")
-print("==============================")
+print("Parse Tree:")
+print(result)
 
-# Compile the AST to IR
-ir = compile_code(result)
-print(ir)
+# Perform semantic analysis
+analyzer = SemanticAnalyzer()
+try:
+    analyzer.analyze(result)
+    print("\nSemantic Analysis Passed")
+    # Compile the AST to IR
+    code_gen = compile_code(result)
+    print(code_gen)
 
-print("==============================")
-# Execute the generated IR
-execute_ir(ir)
+    print("============Gnerated code executing now==================")
+    # Execute the generated IR
+    execute_ir(code_gen)
+except Exception as e:
+    print("\nSemantic Analysis Error:", e)
