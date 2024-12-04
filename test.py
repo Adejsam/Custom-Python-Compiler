@@ -53,6 +53,7 @@ print(result)
 # Perform semantic analysis
 analyzer = SemanticAnalyzer()
 try:
+    print("============Testing for errors==================")
     analyzer.analyze(result)
     print("\nSemantic Analysis Passed")
     # Compile the AST to IR
