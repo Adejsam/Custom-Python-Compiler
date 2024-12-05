@@ -24,6 +24,19 @@ class CodeGenerator:
     def declare_scanf(self):
         scanf_ty = ir.FunctionType(ir.IntType(32), [ir.PointerType(ir.IntType(8))], var_arg=True)
         self.scanf = ir.Function(self.module, scanf_ty, name="scanf")
+    
+    def create_error_handling_printf(self, error_msg):
+        """Create a printf for error messages"""
+        error_str = self.create_string_constant(error_msg + "\n")
+        error_ptr = self.builder.bitcast(error_str, ir.PointerType(ir.IntType(8)))
+        self.builder.call(self.printf, [error_ptr])
+        # Create an exit function call to terminate the program
+        exit_ty = ir.FunctionType(ir.VoidType(), [])
+        if 'exit' not in self.module.globals:
+            exit_func = ir.Function(self.module, exit_ty, 'exit')
+        else:
+            exit_func = self.module.globals['exit']
+        self.builder.call(exit_func, [])
 
     def create_string_constant(self, string):
         if string in self.strings:
@@ -321,6 +334,7 @@ class CodeGenerator:
         self.builder.position_at_start(merge_bb)
 
 
+
     def visit_expression(self, node):
         """Enhanced expression handling"""
         if isinstance(node, tuple):
@@ -342,25 +356,61 @@ class CodeGenerator:
         return ir.Constant(ir.DoubleType(), 0.0)
 
     def visit_binop(self, node):
-        """Binary operator handling"""
+        """Binary operator handling with division by zero check"""
         op, left, right = node
         
         if op in ['==', '!=', '>', '>=', '<', '<=']:
             # Handle comparison operators
             return self.visit_comparison((op, left, right))
-            
+        
         # Handle arithmetic operators
         left_val = self.visit_expression(left)
         right_val = self.visit_expression(right)
         
+        # Special handling for division
+        if op == '/':
+            # Create basic blocks for division
+            div_check_block = self.main.append_basic_block(name="div_check")
+            div_ok_block = self.main.append_basic_block(name="div_ok")
+            div_error_block = self.main.append_basic_block(name="div_error")
+            div_continue_block = self.main.append_basic_block(name="div_continue")
+            
+            # Branch to division check
+            self.builder.branch(div_check_block)
+            
+            # Check for division by zero
+            self.builder.position_at_start(div_check_block)
+            zero = ir.Constant(ir.DoubleType(), 0.0)
+            is_zero = self.builder.fcmp_ordered('==', right_val, zero)
+            self.builder.cbranch(is_zero, div_error_block, div_ok_block)
+            
+            # Error block
+            self.builder.position_at_start(div_error_block)
+            self.create_error_handling_printf("Error: Division by zero!")
+            self.builder.branch(div_continue_block)
+            
+            # OK block - perform division
+            self.builder.position_at_start(div_ok_block)
+            div_result = self.builder.fdiv(left_val, right_val)
+            self.builder.branch(div_continue_block)
+            
+            # Continue block
+            self.builder.position_at_start(div_continue_block)
+            
+            # PHI node to merge results or handle error
+            phi = self.builder.phi(ir.DoubleType())
+            phi.add_incoming(ir.Constant(ir.DoubleType(), 0.0), div_error_block)
+            phi.add_incoming(div_result, div_ok_block)
+            
+            return phi
+        
+        # Other arithmetic operations
         if op == '+':
             return self.builder.fadd(left_val, right_val)
         elif op == '-':
             return self.builder.fsub(left_val, right_val)
         elif op == '*':
             return self.builder.fmul(left_val, right_val)
-        elif op == '/':
-            return self.builder.fdiv(left_val, right_val)
         elif op == '**' or op == '^':
             # Create function type for pow (double precision)
             pow_func_type = ir.FunctionType(ir.DoubleType(), [ir.DoubleType(), ir.DoubleType()])
@@ -373,6 +423,7 @@ class CodeGenerator:
             
             # Call the pow function
             return self.builder.call(pow_func, [left_val, right_val])
+
 
     def visit_comparison(self, node):
         """Comparison operator handling"""

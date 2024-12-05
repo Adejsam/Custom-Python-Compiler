@@ -34,6 +34,8 @@ print(total_steps)
 
 print("Average number of steps for any student:")
 print(average_steps)
+
+print(10/0)
 '''
 
 # Build lexer
