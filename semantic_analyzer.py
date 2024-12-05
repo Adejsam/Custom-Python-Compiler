@@ -307,8 +307,15 @@ class SemanticAnalyzer:
                     
                     print(f"Binary operation: {operator} with types {left_type} and {right_type}")
                     
+                    # Division by Zero Check
+                    if operator in ['/', '//']:
+                        # Check if the right operand is a literal zero or constant zero
+                        if (isinstance(value[2], (int, float)) and value[2] == 0) or \
+                           (isinstance(value[2], str) and value[2] == '0'):
+                            raise Exception("Semantic Error: Division by zero")
+                    
                     # Arithmetic operations
-                    arithmetic_ops = ['+', '-', '*', '/', '**', '^']
+                    arithmetic_ops = ['+', '-', '*', '/', '//', '**', '^']
                     if operator in arithmetic_ops:
                         if left_type not in ['int', 'float'] or right_type not in ['int', 'float']:
                             raise Exception(f"Type Error: Cannot perform {operator} on non-numeric types {left_type} and {right_type}. "
