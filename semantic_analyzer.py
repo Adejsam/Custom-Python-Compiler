@@ -139,20 +139,18 @@ class SemanticAnalyzer:
                 if index_type != 'int':
                     raise Exception(f"Semantic Error: List index must be an integer, got {index_type}")
 
-            # Input Statement - Modified to set float type
+            # Input Statement
             elif node_type == 'input':
                 var_name = node[1]  # Variable name for input
                 prompt = node[2]  # Prompt message
-                # Declare variable with 'float' type instead of 'str'
-                self.declare_variable(var_name, 'float')  # Set type for input variable
+                self.declare_variable(var_name, 'float')  # Assume input variables are floats
 
-            # Multiple Input Statement - Also set to float type
+            # Multiple Input Statement
             elif node_type == 'input_multiple':
                 var_names = node[1]  # List of variable names for input
                 prompt = node[2]  # Prompt message
                 for var_name in var_names:
-                    # Declare each variable with 'float' type
-                    self.declare_variable(var_name, 'float')  # Set type for each input variable
+                    self.declare_variable(var_name, 'float')  # Assume each input variable is a float
 
             # Assignment
             elif node_type == 'assign':
@@ -162,10 +160,13 @@ class SemanticAnalyzer:
                 self.declare_variable(var_name, expr_type)  # Declare the variable with the evaluated type
 
             # Print Statement
+            # Print Statement
             elif node_type == 'print':
-                # Handle multiple arguments in print statement
-                for arg in node[1:]:  # Iterate over all arguments
-                    self.evaluate_expression(arg)  # Ensure each argument is valid
+                print_args = node[1]  # Extract arguments for the print statement
+                for arg in print_args:
+                    resolved_type = self.evaluate_expression(arg)  # Resolve the type of each argument
+                    if resolved_type == 'unknown':
+                        raise Exception(f"Semantic Error: Unable to resolve type for print argument '{arg}'")
 
             # If Statement
             elif node_type == 'if_stmt':
@@ -235,7 +236,7 @@ class SemanticAnalyzer:
             pass  # Handle base cases like literals or identifiers
 
     def evaluate_expression(self, expr):
-        """Evaluate an expression to check semantic validity with enhanced error reporting."""
+        """Evaluate an expression to determine its type."""
         def identify_type(value):
             # Debug print to track type resolution
             print(f"Resolving type for: {value}")
@@ -250,14 +251,10 @@ class SemanticAnalyzer:
                     print(f"Variable {value} resolved to type: {var_type}")
                     return var_type  # Return variable type
                 except Exception:
-                    # If lookup fails, assume it's a numeric type
-                    try:
-                        float(value)  # Try to convert to float
-                        return 'float'  # Return float type
-                    except ValueError:
-                        raise Exception(f"Semantic Error: Unrecognized identifier '{value}'")  # Raise error for unrecognized identifier
+                    # If lookup fails, raise error
+                    raise Exception(f"Semantic Error: Unrecognized identifier '{value}'")
             
-            # Check for numeric types
+            # Check for numeric literals
             if isinstance(value, (int, float)):
                 return 'float'  # Return float type for numeric literals
             
@@ -272,7 +269,7 @@ class SemanticAnalyzer:
                 if value[0] == 'function_call':
                     func_name = value[1]  # Function name
                     if func_name not in self.functions:
-                        raise Exception(f"Semantic Error: Function '{func_name}' not defined")  # Raise error if function not defined
+                        raise Exception(f"Semantic Error: Function '{func_name}' not defined")
                     func_return_type = self.functions[func_name].get('return_type', 'float')  # Default to float for input
                     print(f"Function {func_name} return type: {func_return_type}")
                     return func_return_type  # Return function return type
@@ -287,18 +284,16 @@ class SemanticAnalyzer:
                     
                     # Division by Zero Check
                     if operator in ['/', '//']:
-                        # Check if the right operand is a literal zero or constant zero
                         if (isinstance(value[2], (int, float)) and value[2] == 0) or \
-                           (isinstance(value[2], str) and value[2] == '0'):
-                            raise Exception("Semantic Error: Division by zero")  # Raise error for division by zero
+                        (isinstance(value[2], str) and value[2] == '0'):
+                            raise Exception("Semantic Error: Division by zero")
                     
                     # Arithmetic operations
                     arithmetic_ops = ['+', '-', '*', '/', '//', '**', '^']
                     if operator in arithmetic_ops:
                         if left_type not in ['int', 'float'] or right_type not in ['int', 'float']:
-                            raise Exception(f"Type Error: Cannot perform {operator} on non-numeric types {left_type} and {right_type}. "
-                                            f"Detailed context: Left value {value[1]}, Right value {value[2]}")
-                        return 'float'  # Always return float for arithmetic operations
+                            raise Exception(f"Type Error: Cannot perform {operator} on non-numeric types {left_type} and {right_type}.")
+                        return 'float'  # Return float for arithmetic operations
                     
                     # Comparison operations
                     comparison_ops = ['==', '!=', '>', '>=', '<', '<=']

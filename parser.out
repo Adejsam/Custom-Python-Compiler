@@ -40,7 +40,7 @@ Rule 25    argument_list -> expression
 Rule 26    argument_list -> expression COMMA argument_list
 Rule 27    return_stmt -> RETURN expression
 Rule 28    return_stmt -> RETURN
-Rule 29    print_stmt -> PRINT LPAREN expression RPAREN
+Rule 29    print_stmt -> PRINT LPAREN print_arguments RPAREN
 Rule 30    print_arguments -> expression
 Rule 31    print_arguments -> expression COMMA print_arguments
 Rule 32    assignment_stmt -> ID EQUALS expression
@@ -151,7 +151,7 @@ break_stmt           : 17
 elif_stmt            : 45 46 47 48
 else_stmt            : 45 46
 empty                : 5 49 52
-expression           : 18 25 26 27 29 30 31 32 40 41 42 43 45 46 47 48 53 54 54 55 55 56 56 57 57 58 58 59 59 60 60 61 61 62 62 63 63 64 64 65 65 66 66 67 67 68 69 70
+expression           : 18 25 26 27 30 31 32 40 41 42 43 45 46 47 48 53 54 54 55 55 56 56 57 57 58 58 59 59 60 60 61 61 62 62 63 63 64 64 65 65 66 66 67 67 68 69 70
 for_stmt             : 12
 function_call        : 15
 function_def         : 14
@@ -162,7 +162,7 @@ input_stmt           : 9
 list_elements        : 38 41
 list_stmt            : 13
 parameter_list       : 19 22
-print_arguments      : 31
+print_arguments      : 29 31
 print_stmt           : 7
 program              : 0
 return_stmt          : 16
@@ -193,7 +193,7 @@ state 0
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -312,7 +312,7 @@ state 3
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -858,7 +858,7 @@ state 16
 
 state 17
 
-    (29) print_stmt -> PRINT . LPAREN expression RPAREN
+    (29) print_stmt -> PRINT . LPAREN print_arguments RPAREN
 
     LPAREN          shift and go to state 51
 
@@ -1559,7 +1559,7 @@ state 36
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -2255,7 +2255,9 @@ state 50
 
 state 51
 
-    (29) print_stmt -> PRINT LPAREN . expression RPAREN
+    (29) print_stmt -> PRINT LPAREN . print_arguments RPAREN
+    (30) print_arguments -> . expression
+    (31) print_arguments -> . expression COMMA print_arguments
     (42) expression -> . ID LBRACKET expression RBRACKET
     (43) expression -> . ID DOT APPEND LPAREN expression RPAREN
     (55) expression -> . expression PLUS expression
@@ -2293,7 +2295,8 @@ state 51
     TRUE            shift and go to state 33
     FALSE           shift and go to state 34
 
-    expression                     shift and go to state 81
+    print_arguments                shift and go to state 81
+    expression                     shift and go to state 82
 
 state 52
 
@@ -2312,7 +2315,7 @@ state 52
     (66) expression -> expression . LESS expression
     (67) expression -> expression . LESS_EQUAL expression
 
-    RPAREN          shift and go to state 82
+    RPAREN          shift and go to state 83
     PLUS            shift and go to state 38
     MINUS           shift and go to state 39
     TIMES           shift and go to state 40
@@ -2407,8 +2410,8 @@ state 54
     (76) expression -> . FALSE
     (77) expression -> . ID
 
-    INPUT           shift and go to state 84
-    LBRACKET        shift and go to state 85
+    INPUT           shift and go to state 85
+    LBRACKET        shift and go to state 86
     ID              shift and go to state 53
     MINUS           shift and go to state 28
     NOT             shift and go to state 29
@@ -2420,7 +2423,7 @@ state 54
     TRUE            shift and go to state 33
     FALSE           shift and go to state 34
 
-    expression                     shift and go to state 83
+    expression                     shift and go to state 84
 
 state 55
 
@@ -2454,7 +2457,7 @@ state 55
     (76) expression -> . FALSE
     (77) expression -> . ID
 
-    RPAREN          shift and go to state 87
+    RPAREN          shift and go to state 88
     ID              shift and go to state 53
     MINUS           shift and go to state 28
     NOT             shift and go to state 29
@@ -2466,8 +2469,8 @@ state 55
     TRUE            shift and go to state 33
     FALSE           shift and go to state 34
 
-    argument_list                  shift and go to state 86
-    expression                     shift and go to state 88
+    argument_list                  shift and go to state 87
+    expression                     shift and go to state 89
 
 state 56
 
@@ -2509,13 +2512,13 @@ state 56
     TRUE            shift and go to state 33
     FALSE           shift and go to state 34
 
-    expression                     shift and go to state 89
+    expression                     shift and go to state 90
 
 state 57
 
     (43) expression -> ID DOT . APPEND LPAREN expression RPAREN
 
-    APPEND          shift and go to state 90
+    APPEND          shift and go to state 91
 
 
 state 58
@@ -2525,9 +2528,9 @@ state 58
     (36) id_list -> . ID COMMA ID
     (37) id_list -> . ID COMMA id_list
 
-    ID              shift and go to state 91
+    ID              shift and go to state 92
 
-    id_list                        shift and go to state 92
+    id_list                        shift and go to state 93
 
 state 59
 
@@ -2547,7 +2550,7 @@ state 59
     (66) expression -> expression . LESS expression
     (67) expression -> expression . LESS_EQUAL expression
 
-    COLON           shift and go to state 93
+    COLON           shift and go to state 94
     PLUS            shift and go to state 38
     MINUS           shift and go to state 39
     TIMES           shift and go to state 40
@@ -2580,7 +2583,7 @@ state 60
     (66) expression -> expression . LESS expression
     (67) expression -> expression . LESS_EQUAL expression
 
-    COLON           shift and go to state 94
+    COLON           shift and go to state 95
     PLUS            shift and go to state 38
     MINUS           shift and go to state 39
     TIMES           shift and go to state 40
@@ -2600,7 +2603,7 @@ state 61
 
     (54) for_stmt -> FOR ID . IN RANGE LPAREN expression COMMA expression RPAREN COLON NEWLINE statements
 
-    IN              shift and go to state 95
+    IN              shift and go to state 96
 
 
 state 62
@@ -2608,7 +2611,7 @@ state 62
     (19) function_def -> DEF ID . LPAREN parameter_list RPAREN COLON NEWLINE statements
     (20) function_def -> DEF ID . LPAREN RPAREN COLON NEWLINE statements
 
-    LPAREN          shift and go to state 96
+    LPAREN          shift and go to state 97
 
 
 state 63
@@ -2823,7 +2826,7 @@ state 66
 
     (35) input_multiple -> id_list EQUALS . INPUT LPAREN STRING RPAREN
 
-    INPUT           shift and go to state 97
+    INPUT           shift and go to state 98
 
 
 state 67
@@ -3765,7 +3768,15 @@ state 80
 
 state 81
 
-    (29) print_stmt -> PRINT LPAREN expression . RPAREN
+    (29) print_stmt -> PRINT LPAREN print_arguments . RPAREN
+
+    RPAREN          shift and go to state 99
+
+
+state 82
+
+    (30) print_arguments -> expression .
+    (31) print_arguments -> expression . COMMA print_arguments
     (55) expression -> expression . PLUS expression
     (56) expression -> expression . MINUS expression
     (57) expression -> expression . TIMES expression
@@ -3780,7 +3791,8 @@ state 81
     (66) expression -> expression . LESS expression
     (67) expression -> expression . LESS_EQUAL expression
 
-    RPAREN          shift and go to state 98
+    RPAREN          reduce using rule 30 (print_arguments -> expression .)
+    COMMA           shift and go to state 100
     PLUS            shift and go to state 38
     MINUS           shift and go to state 39
     TIMES           shift and go to state 40
@@ -3796,7 +3808,7 @@ state 81
     LESS_EQUAL      shift and go to state 50
 
 
-state 82
+state 83
 
     (70) expression -> LPAREN expression RPAREN .
 
@@ -3839,7 +3851,7 @@ state 82
     RBRACKET        reduce using rule 70 (expression -> LPAREN expression RPAREN .)
 
 
-state 83
+state 84
 
     (32) assignment_stmt -> ID EQUALS expression .
     (55) expression -> expression . PLUS expression
@@ -3894,14 +3906,14 @@ state 83
   ! MINUS           [ reduce using rule 32 (assignment_stmt -> ID EQUALS expression .) ]
 
 
-state 84
+state 85
 
     (33) input_stmt -> ID EQUALS INPUT . LPAREN STRING RPAREN
 
-    LPAREN          shift and go to state 99
+    LPAREN          shift and go to state 101
 
 
-state 85
+state 86
 
     (38) list_stmt -> ID EQUALS LBRACKET . list_elements RBRACKET
     (39) list_stmt -> ID EQUALS LBRACKET . RBRACKET
@@ -3933,7 +3945,7 @@ state 85
     (76) expression -> . FALSE
     (77) expression -> . ID
 
-    RBRACKET        shift and go to state 101
+    RBRACKET        shift and go to state 103
     ID              shift and go to state 53
     MINUS           shift and go to state 28
     NOT             shift and go to state 29
@@ -3945,17 +3957,17 @@ state 85
     TRUE            shift and go to state 33
     FALSE           shift and go to state 34
 
-    list_elements                  shift and go to state 100
-    expression                     shift and go to state 102
+    list_elements                  shift and go to state 102
+    expression                     shift and go to state 104
 
-state 86
+state 87
 
     (23) function_call -> ID LPAREN argument_list . RPAREN
 
-    RPAREN          shift and go to state 103
+    RPAREN          shift and go to state 105
 
 
-state 87
+state 88
 
     (24) function_call -> ID LPAREN RPAREN .
 
@@ -3982,7 +3994,7 @@ state 87
     ELSE            reduce using rule 24 (function_call -> ID LPAREN RPAREN .)
 
 
-state 88
+state 89
 
     (25) argument_list -> expression .
     (26) argument_list -> expression . COMMA argument_list
@@ -4001,40 +4013,7 @@ state 88
     (67) expression -> expression . LESS_EQUAL expression
 
     RPAREN          reduce using rule 25 (argument_list -> expression .)
-    COMMA           shift and go to state 104
-    PLUS            shift and go to state 38
-    MINUS           shift and go to state 39
-    TIMES           shift and go to state 40
-    DIVIDE          shift and go to state 41
-    POWER           shift and go to state 42
-    AND             shift and go to state 43
-    OR              shift and go to state 44
-    EQUAL_EQUAL     shift and go to state 45
-    NOT_EQUAL       shift and go to state 46
-    GREATER         shift and go to state 47
-    GREATER_EQUAL   shift and go to state 48
-    LESS            shift and go to state 49
-    LESS_EQUAL      shift and go to state 50
-
-
-state 89
-
-    (42) expression -> ID LBRACKET expression . RBRACKET
-    (55) expression -> expression . PLUS expression
-    (56) expression -> expression . MINUS expression
-    (57) expression -> expression . TIMES expression
-    (58) expression -> expression . DIVIDE expression
-    (59) expression -> expression . POWER expression
-    (60) expression -> expression . AND expression
-    (61) expression -> expression . OR expression
-    (62) expression -> expression . EQUAL_EQUAL expression
-    (63) expression -> expression . NOT_EQUAL expression
-    (64) expression -> expression . GREATER expression
-    (65) expression -> expression . GREATER_EQUAL expression
-    (66) expression -> expression . LESS expression
-    (67) expression -> expression . LESS_EQUAL expression
-
-    RBRACKET        shift and go to state 105
+    COMMA           shift and go to state 106
     PLUS            shift and go to state 38
     MINUS           shift and go to state 39
     TIMES           shift and go to state 40
@@ -4052,12 +4031,45 @@ state 89
 
 state 90
 
-    (43) expression -> ID DOT APPEND . LPAREN expression RPAREN
+    (42) expression -> ID LBRACKET expression . RBRACKET
+    (55) expression -> expression . PLUS expression
+    (56) expression -> expression . MINUS expression
+    (57) expression -> expression . TIMES expression
+    (58) expression -> expression . DIVIDE expression
+    (59) expression -> expression . POWER expression
+    (60) expression -> expression . AND expression
+    (61) expression -> expression . OR expression
+    (62) expression -> expression . EQUAL_EQUAL expression
+    (63) expression -> expression . NOT_EQUAL expression
+    (64) expression -> expression . GREATER expression
+    (65) expression -> expression . GREATER_EQUAL expression
+    (66) expression -> expression . LESS expression
+    (67) expression -> expression . LESS_EQUAL expression
 
-    LPAREN          shift and go to state 106
+    RBRACKET        shift and go to state 107
+    PLUS            shift and go to state 38
+    MINUS           shift and go to state 39
+    TIMES           shift and go to state 40
+    DIVIDE          shift and go to state 41
+    POWER           shift and go to state 42
+    AND             shift and go to state 43
+    OR              shift and go to state 44
+    EQUAL_EQUAL     shift and go to state 45
+    NOT_EQUAL       shift and go to state 46
+    GREATER         shift and go to state 47
+    GREATER_EQUAL   shift and go to state 48
+    LESS            shift and go to state 49
+    LESS_EQUAL      shift and go to state 50
 
 
 state 91
+
+    (43) expression -> ID DOT APPEND . LPAREN expression RPAREN
+
+    LPAREN          shift and go to state 108
+
+
+state 92
 
     (36) id_list -> ID COMMA ID .
     (36) id_list -> ID . COMMA ID
@@ -4067,14 +4079,14 @@ state 91
     COMMA           shift and go to state 58
 
 
-state 92
+state 93
 
     (37) id_list -> ID COMMA id_list .
 
     EQUALS          reduce using rule 37 (id_list -> ID COMMA id_list .)
 
 
-state 93
+state 94
 
     (45) if_stmt -> IF expression COLON . NEWLINE statements elif_stmt else_stmt
     (46) if_stmt -> IF expression COLON . statements elif_stmt else_stmt
@@ -4095,7 +4107,7 @@ state 93
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -4159,7 +4171,7 @@ state 93
   ! shift/reduce conflict for STRING resolved as shift
   ! shift/reduce conflict for TRUE resolved as shift
   ! shift/reduce conflict for FALSE resolved as shift
-    NEWLINE         shift and go to state 107
+    NEWLINE         shift and go to state 109
     $end            reduce using rule 6 (empty -> .)
     ELIF            reduce using rule 6 (empty -> .)
     ELSE            reduce using rule 6 (empty -> .)
@@ -4201,7 +4213,7 @@ state 93
   ! FALSE           [ reduce using rule 6 (empty -> .) ]
 
     expression                     shift and go to state 16
-    statements                     shift and go to state 108
+    statements                     shift and go to state 110
     statement                      shift and go to state 3
     empty                          shift and go to state 4
     print_stmt                     shift and go to state 5
@@ -4218,81 +4230,126 @@ state 93
     input_multiple                 shift and go to state 21
     id_list                        shift and go to state 35
 
-state 94
+state 95
 
     (53) while_stmt -> WHILE expression COLON . NEWLINE statements
 
-    NEWLINE         shift and go to state 109
-
-
-state 95
-
-    (54) for_stmt -> FOR ID IN . RANGE LPAREN expression COMMA expression RPAREN COLON NEWLINE statements
-
-    RANGE           shift and go to state 110
+    NEWLINE         shift and go to state 111
 
 
 state 96
+
+    (54) for_stmt -> FOR ID IN . RANGE LPAREN expression COMMA expression RPAREN COLON NEWLINE statements
+
+    RANGE           shift and go to state 112
+
+
+state 97
 
     (19) function_def -> DEF ID LPAREN . parameter_list RPAREN COLON NEWLINE statements
     (20) function_def -> DEF ID LPAREN . RPAREN COLON NEWLINE statements
     (21) parameter_list -> . ID
     (22) parameter_list -> . ID COMMA parameter_list
 
-    RPAREN          shift and go to state 113
-    ID              shift and go to state 111
+    RPAREN          shift and go to state 115
+    ID              shift and go to state 113
 
-    parameter_list                 shift and go to state 112
-
-state 97
-
-    (35) input_multiple -> id_list EQUALS INPUT . LPAREN STRING RPAREN
-
-    LPAREN          shift and go to state 114
-
+    parameter_list                 shift and go to state 114
 
 state 98
 
-    (29) print_stmt -> PRINT LPAREN expression RPAREN .
+    (35) input_multiple -> id_list EQUALS INPUT . LPAREN STRING RPAREN
 
-    NEWLINE         reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    PRINT           reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    ID              reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    IF              reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    WHILE           reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    FOR             reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    DEF             reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    RETURN          reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    BREAK           reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    MINUS           reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    NOT             reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    LPAREN          reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    NUMBER          reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    FLOAT           reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    INT             reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    STRING          reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    TRUE            reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    FALSE           reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    $end            reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    ELIF            reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
-    ELSE            reduce using rule 29 (print_stmt -> PRINT LPAREN expression RPAREN .)
+    LPAREN          shift and go to state 116
 
 
 state 99
 
-    (33) input_stmt -> ID EQUALS INPUT LPAREN . STRING RPAREN
+    (29) print_stmt -> PRINT LPAREN print_arguments RPAREN .
 
-    STRING          shift and go to state 115
+    NEWLINE         reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    PRINT           reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    ID              reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    IF              reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    WHILE           reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    FOR             reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    DEF             reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    RETURN          reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    BREAK           reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    MINUS           reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    NOT             reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    LPAREN          reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    NUMBER          reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    FLOAT           reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    INT             reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    STRING          reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    TRUE            reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    FALSE           reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    $end            reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    ELIF            reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
+    ELSE            reduce using rule 29 (print_stmt -> PRINT LPAREN print_arguments RPAREN .)
 
 
 state 100
 
-    (38) list_stmt -> ID EQUALS LBRACKET list_elements . RBRACKET
+    (31) print_arguments -> expression COMMA . print_arguments
+    (30) print_arguments -> . expression
+    (31) print_arguments -> . expression COMMA print_arguments
+    (42) expression -> . ID LBRACKET expression RBRACKET
+    (43) expression -> . ID DOT APPEND LPAREN expression RPAREN
+    (55) expression -> . expression PLUS expression
+    (56) expression -> . expression MINUS expression
+    (57) expression -> . expression TIMES expression
+    (58) expression -> . expression DIVIDE expression
+    (59) expression -> . expression POWER expression
+    (60) expression -> . expression AND expression
+    (61) expression -> . expression OR expression
+    (62) expression -> . expression EQUAL_EQUAL expression
+    (63) expression -> . expression NOT_EQUAL expression
+    (64) expression -> . expression GREATER expression
+    (65) expression -> . expression GREATER_EQUAL expression
+    (66) expression -> . expression LESS expression
+    (67) expression -> . expression LESS_EQUAL expression
+    (68) expression -> . MINUS expression
+    (69) expression -> . NOT expression
+    (70) expression -> . LPAREN expression RPAREN
+    (71) expression -> . NUMBER
+    (72) expression -> . FLOAT
+    (73) expression -> . INT
+    (74) expression -> . STRING
+    (75) expression -> . TRUE
+    (76) expression -> . FALSE
+    (77) expression -> . ID
 
-    RBRACKET        shift and go to state 116
+    ID              shift and go to state 53
+    MINUS           shift and go to state 28
+    NOT             shift and go to state 29
+    LPAREN          shift and go to state 18
+    NUMBER          shift and go to state 30
+    FLOAT           shift and go to state 31
+    INT             shift and go to state 32
+    STRING          shift and go to state 20
+    TRUE            shift and go to state 33
+    FALSE           shift and go to state 34
 
+    expression                     shift and go to state 82
+    print_arguments                shift and go to state 117
 
 state 101
+
+    (33) input_stmt -> ID EQUALS INPUT LPAREN . STRING RPAREN
+
+    STRING          shift and go to state 118
+
+
+state 102
+
+    (38) list_stmt -> ID EQUALS LBRACKET list_elements . RBRACKET
+
+    RBRACKET        shift and go to state 119
+
+
+state 103
 
     (39) list_stmt -> ID EQUALS LBRACKET RBRACKET .
 
@@ -4319,7 +4376,7 @@ state 101
     ELSE            reduce using rule 39 (list_stmt -> ID EQUALS LBRACKET RBRACKET .)
 
 
-state 102
+state 104
 
     (40) list_elements -> expression .
     (41) list_elements -> expression . COMMA list_elements
@@ -4338,7 +4395,7 @@ state 102
     (67) expression -> expression . LESS_EQUAL expression
 
     RBRACKET        reduce using rule 40 (list_elements -> expression .)
-    COMMA           shift and go to state 117
+    COMMA           shift and go to state 120
     PLUS            shift and go to state 38
     MINUS           shift and go to state 39
     TIMES           shift and go to state 40
@@ -4354,7 +4411,7 @@ state 102
     LESS_EQUAL      shift and go to state 50
 
 
-state 103
+state 105
 
     (23) function_call -> ID LPAREN argument_list RPAREN .
 
@@ -4381,7 +4438,7 @@ state 103
     ELSE            reduce using rule 23 (function_call -> ID LPAREN argument_list RPAREN .)
 
 
-state 104
+state 106
 
     (26) argument_list -> expression COMMA . argument_list
     (25) argument_list -> . expression
@@ -4423,10 +4480,10 @@ state 104
     TRUE            shift and go to state 33
     FALSE           shift and go to state 34
 
-    expression                     shift and go to state 88
-    argument_list                  shift and go to state 118
+    expression                     shift and go to state 89
+    argument_list                  shift and go to state 121
 
-state 105
+state 107
 
     (42) expression -> ID LBRACKET expression RBRACKET .
 
@@ -4469,7 +4526,7 @@ state 105
     RBRACKET        reduce using rule 42 (expression -> ID LBRACKET expression RBRACKET .)
 
 
-state 106
+state 108
 
     (43) expression -> ID DOT APPEND LPAREN . expression RPAREN
     (42) expression -> . ID LBRACKET expression RBRACKET
@@ -4509,9 +4566,9 @@ state 106
     TRUE            shift and go to state 33
     FALSE           shift and go to state 34
 
-    expression                     shift and go to state 119
+    expression                     shift and go to state 122
 
-state 107
+state 109
 
     (45) if_stmt -> IF expression COLON NEWLINE . statements elif_stmt else_stmt
     (2) statements -> . statement NEWLINE statements
@@ -4531,7 +4588,7 @@ state 107
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -4635,7 +4692,7 @@ state 107
   ! FALSE           [ reduce using rule 6 (empty -> .) ]
 
     expression                     shift and go to state 16
-    statements                     shift and go to state 120
+    statements                     shift and go to state 123
     statement                      shift and go to state 3
     empty                          shift and go to state 4
     print_stmt                     shift and go to state 5
@@ -4652,7 +4709,7 @@ state 107
     input_multiple                 shift and go to state 21
     id_list                        shift and go to state 35
 
-state 108
+state 110
 
     (46) if_stmt -> IF expression COLON statements . elif_stmt else_stmt
     (47) elif_stmt -> . ELIF expression COLON NEWLINE statements elif_stmt
@@ -4661,7 +4718,7 @@ state 108
     (6) empty -> .
 
   ! shift/reduce conflict for ELIF resolved as shift
-    ELIF            shift and go to state 122
+    ELIF            shift and go to state 125
     $end            reduce using rule 6 (empty -> .)
     ELSE            reduce using rule 6 (empty -> .)
     NEWLINE         reduce using rule 6 (empty -> .)
@@ -4685,10 +4742,10 @@ state 108
 
   ! ELIF            [ reduce using rule 6 (empty -> .) ]
 
-    elif_stmt                      shift and go to state 121
-    empty                          shift and go to state 123
+    elif_stmt                      shift and go to state 124
+    empty                          shift and go to state 126
 
-state 109
+state 111
 
     (53) while_stmt -> WHILE expression COLON NEWLINE . statements
     (2) statements -> . statement NEWLINE statements
@@ -4708,7 +4765,7 @@ state 109
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -4812,7 +4869,7 @@ state 109
   ! FALSE           [ reduce using rule 6 (empty -> .) ]
 
     expression                     shift and go to state 16
-    statements                     shift and go to state 124
+    statements                     shift and go to state 127
     statement                      shift and go to state 3
     empty                          shift and go to state 4
     print_stmt                     shift and go to state 5
@@ -4829,51 +4886,58 @@ state 109
     input_multiple                 shift and go to state 21
     id_list                        shift and go to state 35
 
-state 110
+state 112
 
     (54) for_stmt -> FOR ID IN RANGE . LPAREN expression COMMA expression RPAREN COLON NEWLINE statements
 
-    LPAREN          shift and go to state 125
+    LPAREN          shift and go to state 128
 
 
-state 111
+state 113
 
     (21) parameter_list -> ID .
     (22) parameter_list -> ID . COMMA parameter_list
 
     RPAREN          reduce using rule 21 (parameter_list -> ID .)
-    COMMA           shift and go to state 126
-
-
-state 112
-
-    (19) function_def -> DEF ID LPAREN parameter_list . RPAREN COLON NEWLINE statements
-
-    RPAREN          shift and go to state 127
-
-
-state 113
-
-    (20) function_def -> DEF ID LPAREN RPAREN . COLON NEWLINE statements
-
-    COLON           shift and go to state 128
+    COMMA           shift and go to state 129
 
 
 state 114
 
-    (35) input_multiple -> id_list EQUALS INPUT LPAREN . STRING RPAREN
-
-    STRING          shift and go to state 129
-
-
-state 115
-
-    (33) input_stmt -> ID EQUALS INPUT LPAREN STRING . RPAREN
+    (19) function_def -> DEF ID LPAREN parameter_list . RPAREN COLON NEWLINE statements
 
     RPAREN          shift and go to state 130
 
 
+state 115
+
+    (20) function_def -> DEF ID LPAREN RPAREN . COLON NEWLINE statements
+
+    COLON           shift and go to state 131
+
+
 state 116
+
+    (35) input_multiple -> id_list EQUALS INPUT LPAREN . STRING RPAREN
+
+    STRING          shift and go to state 132
+
+
+state 117
+
+    (31) print_arguments -> expression COMMA print_arguments .
+
+    RPAREN          reduce using rule 31 (print_arguments -> expression COMMA print_arguments .)
+
+
+state 118
+
+    (33) input_stmt -> ID EQUALS INPUT LPAREN STRING . RPAREN
+
+    RPAREN          shift and go to state 133
+
+
+state 119
 
     (38) list_stmt -> ID EQUALS LBRACKET list_elements RBRACKET .
 
@@ -4900,7 +4964,7 @@ state 116
     ELSE            reduce using rule 38 (list_stmt -> ID EQUALS LBRACKET list_elements RBRACKET .)
 
 
-state 117
+state 120
 
     (41) list_elements -> expression COMMA . list_elements
     (40) list_elements -> . expression
@@ -4942,17 +5006,17 @@ state 117
     TRUE            shift and go to state 33
     FALSE           shift and go to state 34
 
-    expression                     shift and go to state 102
-    list_elements                  shift and go to state 131
+    expression                     shift and go to state 104
+    list_elements                  shift and go to state 134
 
-state 118
+state 121
 
     (26) argument_list -> expression COMMA argument_list .
 
     RPAREN          reduce using rule 26 (argument_list -> expression COMMA argument_list .)
 
 
-state 119
+state 122
 
     (43) expression -> ID DOT APPEND LPAREN expression . RPAREN
     (55) expression -> expression . PLUS expression
@@ -4969,7 +5033,7 @@ state 119
     (66) expression -> expression . LESS expression
     (67) expression -> expression . LESS_EQUAL expression
 
-    RPAREN          shift and go to state 132
+    RPAREN          shift and go to state 135
     PLUS            shift and go to state 38
     MINUS           shift and go to state 39
     TIMES           shift and go to state 40
@@ -4985,7 +5049,7 @@ state 119
     LESS_EQUAL      shift and go to state 50
 
 
-state 120
+state 123
 
     (45) if_stmt -> IF expression COLON NEWLINE statements . elif_stmt else_stmt
     (47) elif_stmt -> . ELIF expression COLON NEWLINE statements elif_stmt
@@ -4994,7 +5058,7 @@ state 120
     (6) empty -> .
 
   ! shift/reduce conflict for ELIF resolved as shift
-    ELIF            shift and go to state 122
+    ELIF            shift and go to state 125
     $end            reduce using rule 6 (empty -> .)
     ELSE            reduce using rule 6 (empty -> .)
     NEWLINE         reduce using rule 6 (empty -> .)
@@ -5018,10 +5082,10 @@ state 120
 
   ! ELIF            [ reduce using rule 6 (empty -> .) ]
 
-    elif_stmt                      shift and go to state 133
-    empty                          shift and go to state 123
+    elif_stmt                      shift and go to state 136
+    empty                          shift and go to state 126
 
-state 121
+state 124
 
     (46) if_stmt -> IF expression COLON statements elif_stmt . else_stmt
     (50) else_stmt -> . ELSE COLON NEWLINE statements
@@ -5030,7 +5094,7 @@ state 121
     (6) empty -> .
 
   ! shift/reduce conflict for ELSE resolved as shift
-    ELSE            shift and go to state 135
+    ELSE            shift and go to state 138
     $end            reduce using rule 6 (empty -> .)
     ELIF            reduce using rule 6 (empty -> .)
     NEWLINE         reduce using rule 6 (empty -> .)
@@ -5054,10 +5118,10 @@ state 121
 
   ! ELSE            [ reduce using rule 6 (empty -> .) ]
 
-    else_stmt                      shift and go to state 134
-    empty                          shift and go to state 136
+    else_stmt                      shift and go to state 137
+    empty                          shift and go to state 139
 
-state 122
+state 125
 
     (47) elif_stmt -> ELIF . expression COLON NEWLINE statements elif_stmt
     (48) elif_stmt -> ELIF . expression COLON statements elif_stmt
@@ -5098,9 +5162,9 @@ state 122
     TRUE            shift and go to state 33
     FALSE           shift and go to state 34
 
-    expression                     shift and go to state 137
+    expression                     shift and go to state 140
 
-state 123
+state 126
 
     (49) elif_stmt -> empty .
 
@@ -5127,7 +5191,7 @@ state 123
     FALSE           reduce using rule 49 (elif_stmt -> empty .)
 
 
-state 124
+state 127
 
     (53) while_stmt -> WHILE expression COLON NEWLINE statements .
 
@@ -5154,7 +5218,7 @@ state 124
     ELSE            reduce using rule 53 (while_stmt -> WHILE expression COLON NEWLINE statements .)
 
 
-state 125
+state 128
 
     (54) for_stmt -> FOR ID IN RANGE LPAREN . expression COMMA expression RPAREN COLON NEWLINE statements
     (42) expression -> . ID LBRACKET expression RBRACKET
@@ -5194,40 +5258,40 @@ state 125
     TRUE            shift and go to state 33
     FALSE           shift and go to state 34
 
-    expression                     shift and go to state 138
+    expression                     shift and go to state 141
 
-state 126
+state 129
 
     (22) parameter_list -> ID COMMA . parameter_list
     (21) parameter_list -> . ID
     (22) parameter_list -> . ID COMMA parameter_list
 
-    ID              shift and go to state 111
+    ID              shift and go to state 113
 
-    parameter_list                 shift and go to state 139
+    parameter_list                 shift and go to state 142
 
-state 127
+state 130
 
     (19) function_def -> DEF ID LPAREN parameter_list RPAREN . COLON NEWLINE statements
 
-    COLON           shift and go to state 140
+    COLON           shift and go to state 143
 
 
-state 128
+state 131
 
     (20) function_def -> DEF ID LPAREN RPAREN COLON . NEWLINE statements
 
-    NEWLINE         shift and go to state 141
+    NEWLINE         shift and go to state 144
 
 
-state 129
+state 132
 
     (35) input_multiple -> id_list EQUALS INPUT LPAREN STRING . RPAREN
 
-    RPAREN          shift and go to state 142
+    RPAREN          shift and go to state 145
 
 
-state 130
+state 133
 
     (33) input_stmt -> ID EQUALS INPUT LPAREN STRING RPAREN .
 
@@ -5254,14 +5318,14 @@ state 130
     ELSE            reduce using rule 33 (input_stmt -> ID EQUALS INPUT LPAREN STRING RPAREN .)
 
 
-state 131
+state 134
 
     (41) list_elements -> expression COMMA list_elements .
 
     RBRACKET        reduce using rule 41 (list_elements -> expression COMMA list_elements .)
 
 
-state 132
+state 135
 
     (43) expression -> ID DOT APPEND LPAREN expression RPAREN .
 
@@ -5304,7 +5368,7 @@ state 132
     RBRACKET        reduce using rule 43 (expression -> ID DOT APPEND LPAREN expression RPAREN .)
 
 
-state 133
+state 136
 
     (45) if_stmt -> IF expression COLON NEWLINE statements elif_stmt . else_stmt
     (50) else_stmt -> . ELSE COLON NEWLINE statements
@@ -5313,7 +5377,7 @@ state 133
     (6) empty -> .
 
   ! shift/reduce conflict for ELSE resolved as shift
-    ELSE            shift and go to state 135
+    ELSE            shift and go to state 138
     $end            reduce using rule 6 (empty -> .)
     ELIF            reduce using rule 6 (empty -> .)
     NEWLINE         reduce using rule 6 (empty -> .)
@@ -5337,10 +5401,10 @@ state 133
 
   ! ELSE            [ reduce using rule 6 (empty -> .) ]
 
-    else_stmt                      shift and go to state 143
-    empty                          shift and go to state 136
+    else_stmt                      shift and go to state 146
+    empty                          shift and go to state 139
 
-state 134
+state 137
 
     (46) if_stmt -> IF expression COLON statements elif_stmt else_stmt .
 
@@ -5367,15 +5431,15 @@ state 134
     ELSE            reduce using rule 46 (if_stmt -> IF expression COLON statements elif_stmt else_stmt .)
 
 
-state 135
+state 138
 
     (50) else_stmt -> ELSE . COLON NEWLINE statements
     (51) else_stmt -> ELSE . COLON statements
 
-    COLON           shift and go to state 144
+    COLON           shift and go to state 147
 
 
-state 136
+state 139
 
     (52) else_stmt -> empty .
 
@@ -5402,7 +5466,7 @@ state 136
     FALSE           reduce using rule 52 (else_stmt -> empty .)
 
 
-state 137
+state 140
 
     (47) elif_stmt -> ELIF expression . COLON NEWLINE statements elif_stmt
     (48) elif_stmt -> ELIF expression . COLON statements elif_stmt
@@ -5420,7 +5484,7 @@ state 137
     (66) expression -> expression . LESS expression
     (67) expression -> expression . LESS_EQUAL expression
 
-    COLON           shift and go to state 145
+    COLON           shift and go to state 148
     PLUS            shift and go to state 38
     MINUS           shift and go to state 39
     TIMES           shift and go to state 40
@@ -5436,7 +5500,7 @@ state 137
     LESS_EQUAL      shift and go to state 50
 
 
-state 138
+state 141
 
     (54) for_stmt -> FOR ID IN RANGE LPAREN expression . COMMA expression RPAREN COLON NEWLINE statements
     (55) expression -> expression . PLUS expression
@@ -5453,7 +5517,7 @@ state 138
     (66) expression -> expression . LESS expression
     (67) expression -> expression . LESS_EQUAL expression
 
-    COMMA           shift and go to state 146
+    COMMA           shift and go to state 149
     PLUS            shift and go to state 38
     MINUS           shift and go to state 39
     TIMES           shift and go to state 40
@@ -5469,21 +5533,21 @@ state 138
     LESS_EQUAL      shift and go to state 50
 
 
-state 139
+state 142
 
     (22) parameter_list -> ID COMMA parameter_list .
 
     RPAREN          reduce using rule 22 (parameter_list -> ID COMMA parameter_list .)
 
 
-state 140
+state 143
 
     (19) function_def -> DEF ID LPAREN parameter_list RPAREN COLON . NEWLINE statements
 
-    NEWLINE         shift and go to state 147
+    NEWLINE         shift and go to state 150
 
 
-state 141
+state 144
 
     (20) function_def -> DEF ID LPAREN RPAREN COLON NEWLINE . statements
     (2) statements -> . statement NEWLINE statements
@@ -5503,7 +5567,7 @@ state 141
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -5606,7 +5670,7 @@ state 141
   ! TRUE            [ reduce using rule 6 (empty -> .) ]
   ! FALSE           [ reduce using rule 6 (empty -> .) ]
 
-    statements                     shift and go to state 148
+    statements                     shift and go to state 151
     statement                      shift and go to state 3
     empty                          shift and go to state 4
     print_stmt                     shift and go to state 5
@@ -5624,7 +5688,7 @@ state 141
     input_multiple                 shift and go to state 21
     id_list                        shift and go to state 35
 
-state 142
+state 145
 
     (35) input_multiple -> id_list EQUALS INPUT LPAREN STRING RPAREN .
 
@@ -5651,7 +5715,7 @@ state 142
     ELSE            reduce using rule 35 (input_multiple -> id_list EQUALS INPUT LPAREN STRING RPAREN .)
 
 
-state 143
+state 146
 
     (45) if_stmt -> IF expression COLON NEWLINE statements elif_stmt else_stmt .
 
@@ -5678,7 +5742,7 @@ state 143
     ELSE            reduce using rule 45 (if_stmt -> IF expression COLON NEWLINE statements elif_stmt else_stmt .)
 
 
-state 144
+state 147
 
     (50) else_stmt -> ELSE COLON . NEWLINE statements
     (51) else_stmt -> ELSE COLON . statements
@@ -5699,7 +5763,7 @@ state 144
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -5763,7 +5827,7 @@ state 144
   ! shift/reduce conflict for STRING resolved as shift
   ! shift/reduce conflict for TRUE resolved as shift
   ! shift/reduce conflict for FALSE resolved as shift
-    NEWLINE         shift and go to state 149
+    NEWLINE         shift and go to state 152
     $end            reduce using rule 6 (empty -> .)
     ELIF            reduce using rule 6 (empty -> .)
     ELSE            reduce using rule 6 (empty -> .)
@@ -5804,7 +5868,7 @@ state 144
   ! TRUE            [ reduce using rule 6 (empty -> .) ]
   ! FALSE           [ reduce using rule 6 (empty -> .) ]
 
-    statements                     shift and go to state 150
+    statements                     shift and go to state 153
     statement                      shift and go to state 3
     empty                          shift and go to state 4
     print_stmt                     shift and go to state 5
@@ -5822,7 +5886,7 @@ state 144
     input_multiple                 shift and go to state 21
     id_list                        shift and go to state 35
 
-state 145
+state 148
 
     (47) elif_stmt -> ELIF expression COLON . NEWLINE statements elif_stmt
     (48) elif_stmt -> ELIF expression COLON . statements elif_stmt
@@ -5843,7 +5907,7 @@ state 145
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -5907,7 +5971,7 @@ state 145
   ! shift/reduce conflict for STRING resolved as shift
   ! shift/reduce conflict for TRUE resolved as shift
   ! shift/reduce conflict for FALSE resolved as shift
-    NEWLINE         shift and go to state 151
+    NEWLINE         shift and go to state 154
     $end            reduce using rule 6 (empty -> .)
     ELIF            reduce using rule 6 (empty -> .)
     ELSE            reduce using rule 6 (empty -> .)
@@ -5949,7 +6013,7 @@ state 145
   ! FALSE           [ reduce using rule 6 (empty -> .) ]
 
     expression                     shift and go to state 16
-    statements                     shift and go to state 152
+    statements                     shift and go to state 155
     statement                      shift and go to state 3
     empty                          shift and go to state 4
     print_stmt                     shift and go to state 5
@@ -5966,7 +6030,7 @@ state 145
     input_multiple                 shift and go to state 21
     id_list                        shift and go to state 35
 
-state 146
+state 149
 
     (54) for_stmt -> FOR ID IN RANGE LPAREN expression COMMA . expression RPAREN COLON NEWLINE statements
     (42) expression -> . ID LBRACKET expression RBRACKET
@@ -6006,9 +6070,9 @@ state 146
     TRUE            shift and go to state 33
     FALSE           shift and go to state 34
 
-    expression                     shift and go to state 153
+    expression                     shift and go to state 156
 
-state 147
+state 150
 
     (19) function_def -> DEF ID LPAREN parameter_list RPAREN COLON NEWLINE . statements
     (2) statements -> . statement NEWLINE statements
@@ -6028,7 +6092,7 @@ state 147
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -6131,7 +6195,7 @@ state 147
   ! TRUE            [ reduce using rule 6 (empty -> .) ]
   ! FALSE           [ reduce using rule 6 (empty -> .) ]
 
-    statements                     shift and go to state 154
+    statements                     shift and go to state 157
     statement                      shift and go to state 3
     empty                          shift and go to state 4
     print_stmt                     shift and go to state 5
@@ -6149,7 +6213,7 @@ state 147
     input_multiple                 shift and go to state 21
     id_list                        shift and go to state 35
 
-state 148
+state 151
 
     (20) function_def -> DEF ID LPAREN RPAREN COLON NEWLINE statements .
 
@@ -6176,7 +6240,7 @@ state 148
     ELSE            reduce using rule 20 (function_def -> DEF ID LPAREN RPAREN COLON NEWLINE statements .)
 
 
-state 149
+state 152
 
     (50) else_stmt -> ELSE COLON NEWLINE . statements
     (2) statements -> . statement NEWLINE statements
@@ -6196,7 +6260,7 @@ state 149
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -6299,7 +6363,7 @@ state 149
   ! TRUE            [ reduce using rule 6 (empty -> .) ]
   ! FALSE           [ reduce using rule 6 (empty -> .) ]
 
-    statements                     shift and go to state 155
+    statements                     shift and go to state 158
     statement                      shift and go to state 3
     empty                          shift and go to state 4
     print_stmt                     shift and go to state 5
@@ -6317,7 +6381,7 @@ state 149
     input_multiple                 shift and go to state 21
     id_list                        shift and go to state 35
 
-state 150
+state 153
 
     (51) else_stmt -> ELSE COLON statements .
 
@@ -6344,7 +6408,7 @@ state 150
     FALSE           reduce using rule 51 (else_stmt -> ELSE COLON statements .)
 
 
-state 151
+state 154
 
     (47) elif_stmt -> ELIF expression COLON NEWLINE . statements elif_stmt
     (2) statements -> . statement NEWLINE statements
@@ -6364,7 +6428,7 @@ state 151
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -6468,7 +6532,7 @@ state 151
   ! FALSE           [ reduce using rule 6 (empty -> .) ]
 
     expression                     shift and go to state 16
-    statements                     shift and go to state 156
+    statements                     shift and go to state 159
     statement                      shift and go to state 3
     empty                          shift and go to state 4
     print_stmt                     shift and go to state 5
@@ -6485,7 +6549,7 @@ state 151
     input_multiple                 shift and go to state 21
     id_list                        shift and go to state 35
 
-state 152
+state 155
 
     (48) elif_stmt -> ELIF expression COLON statements . elif_stmt
     (47) elif_stmt -> . ELIF expression COLON NEWLINE statements elif_stmt
@@ -6494,7 +6558,7 @@ state 152
     (6) empty -> .
 
   ! shift/reduce conflict for ELIF resolved as shift
-    ELIF            shift and go to state 122
+    ELIF            shift and go to state 125
     $end            reduce using rule 6 (empty -> .)
     ELSE            reduce using rule 6 (empty -> .)
     NEWLINE         reduce using rule 6 (empty -> .)
@@ -6518,10 +6582,10 @@ state 152
 
   ! ELIF            [ reduce using rule 6 (empty -> .) ]
 
-    elif_stmt                      shift and go to state 157
-    empty                          shift and go to state 123
+    elif_stmt                      shift and go to state 160
+    empty                          shift and go to state 126
 
-state 153
+state 156
 
     (54) for_stmt -> FOR ID IN RANGE LPAREN expression COMMA expression . RPAREN COLON NEWLINE statements
     (55) expression -> expression . PLUS expression
@@ -6538,7 +6602,7 @@ state 153
     (66) expression -> expression . LESS expression
     (67) expression -> expression . LESS_EQUAL expression
 
-    RPAREN          shift and go to state 158
+    RPAREN          shift and go to state 161
     PLUS            shift and go to state 38
     MINUS           shift and go to state 39
     TIMES           shift and go to state 40
@@ -6554,7 +6618,7 @@ state 153
     LESS_EQUAL      shift and go to state 50
 
 
-state 154
+state 157
 
     (19) function_def -> DEF ID LPAREN parameter_list RPAREN COLON NEWLINE statements .
 
@@ -6581,7 +6645,7 @@ state 154
     ELSE            reduce using rule 19 (function_def -> DEF ID LPAREN parameter_list RPAREN COLON NEWLINE statements .)
 
 
-state 155
+state 158
 
     (50) else_stmt -> ELSE COLON NEWLINE statements .
 
@@ -6608,7 +6672,7 @@ state 155
     FALSE           reduce using rule 50 (else_stmt -> ELSE COLON NEWLINE statements .)
 
 
-state 156
+state 159
 
     (47) elif_stmt -> ELIF expression COLON NEWLINE statements . elif_stmt
     (47) elif_stmt -> . ELIF expression COLON NEWLINE statements elif_stmt
@@ -6617,7 +6681,7 @@ state 156
     (6) empty -> .
 
   ! shift/reduce conflict for ELIF resolved as shift
-    ELIF            shift and go to state 122
+    ELIF            shift and go to state 125
     $end            reduce using rule 6 (empty -> .)
     ELSE            reduce using rule 6 (empty -> .)
     NEWLINE         reduce using rule 6 (empty -> .)
@@ -6641,10 +6705,10 @@ state 156
 
   ! ELIF            [ reduce using rule 6 (empty -> .) ]
 
-    elif_stmt                      shift and go to state 159
-    empty                          shift and go to state 123
+    elif_stmt                      shift and go to state 162
+    empty                          shift and go to state 126
 
-state 157
+state 160
 
     (48) elif_stmt -> ELIF expression COLON statements elif_stmt .
 
@@ -6671,14 +6735,14 @@ state 157
     FALSE           reduce using rule 48 (elif_stmt -> ELIF expression COLON statements elif_stmt .)
 
 
-state 158
+state 161
 
     (54) for_stmt -> FOR ID IN RANGE LPAREN expression COMMA expression RPAREN . COLON NEWLINE statements
 
-    COLON           shift and go to state 160
+    COLON           shift and go to state 163
 
 
-state 159
+state 162
 
     (47) elif_stmt -> ELIF expression COLON NEWLINE statements elif_stmt .
 
@@ -6705,14 +6769,14 @@ state 159
     FALSE           reduce using rule 47 (elif_stmt -> ELIF expression COLON NEWLINE statements elif_stmt .)
 
 
-state 160
+state 163
 
     (54) for_stmt -> FOR ID IN RANGE LPAREN expression COMMA expression RPAREN COLON . NEWLINE statements
 
-    NEWLINE         shift and go to state 161
+    NEWLINE         shift and go to state 164
 
 
-state 161
+state 164
 
     (54) for_stmt -> FOR ID IN RANGE LPAREN expression COMMA expression RPAREN COLON NEWLINE . statements
     (2) statements -> . statement NEWLINE statements
@@ -6732,7 +6796,7 @@ state 161
     (17) statement -> . break_stmt
     (18) statement -> . expression
     (6) empty -> .
-    (29) print_stmt -> . PRINT LPAREN expression RPAREN
+    (29) print_stmt -> . PRINT LPAREN print_arguments RPAREN
     (32) assignment_stmt -> . ID EQUALS expression
     (33) input_stmt -> . ID EQUALS INPUT LPAREN STRING RPAREN
     (34) input_stmt -> . input_multiple
@@ -6836,7 +6900,7 @@ state 161
   ! FALSE           [ reduce using rule 6 (empty -> .) ]
 
     expression                     shift and go to state 16
-    statements                     shift and go to state 162
+    statements                     shift and go to state 165
     statement                      shift and go to state 3
     empty                          shift and go to state 4
     print_stmt                     shift and go to state 5
@@ -6853,7 +6917,7 @@ state 161
     input_multiple                 shift and go to state 21
     id_list                        shift and go to state 35
 
-state 162
+state 165
 
     (54) for_stmt -> FOR ID IN RANGE LPAREN expression COMMA expression RPAREN COLON NEWLINE statements .
 
@@ -6944,43 +7008,25 @@ WARNING: shift/reduce conflict for GREATER in state 65 resolved as shift
 WARNING: shift/reduce conflict for GREATER_EQUAL in state 65 resolved as shift
 WARNING: shift/reduce conflict for LESS in state 65 resolved as shift
 WARNING: shift/reduce conflict for LESS_EQUAL in state 65 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 83 resolved as shift
-WARNING: shift/reduce conflict for NEWLINE in state 93 resolved as shift
-WARNING: shift/reduce conflict for PRINT in state 93 resolved as shift
-WARNING: shift/reduce conflict for ID in state 93 resolved as shift
-WARNING: shift/reduce conflict for IF in state 93 resolved as shift
-WARNING: shift/reduce conflict for WHILE in state 93 resolved as shift
-WARNING: shift/reduce conflict for FOR in state 93 resolved as shift
-WARNING: shift/reduce conflict for DEF in state 93 resolved as shift
-WARNING: shift/reduce conflict for RETURN in state 93 resolved as shift
-WARNING: shift/reduce conflict for BREAK in state 93 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 93 resolved as shift
-WARNING: shift/reduce conflict for NOT in state 93 resolved as shift
-WARNING: shift/reduce conflict for LPAREN in state 93 resolved as shift
-WARNING: shift/reduce conflict for NUMBER in state 93 resolved as shift
-WARNING: shift/reduce conflict for FLOAT in state 93 resolved as shift
-WARNING: shift/reduce conflict for INT in state 93 resolved as shift
-WARNING: shift/reduce conflict for STRING in state 93 resolved as shift
-WARNING: shift/reduce conflict for TRUE in state 93 resolved as shift
-WARNING: shift/reduce conflict for FALSE in state 93 resolved as shift
-WARNING: shift/reduce conflict for PRINT in state 107 resolved as shift
-WARNING: shift/reduce conflict for ID in state 107 resolved as shift
-WARNING: shift/reduce conflict for IF in state 107 resolved as shift
-WARNING: shift/reduce conflict for WHILE in state 107 resolved as shift
-WARNING: shift/reduce conflict for FOR in state 107 resolved as shift
-WARNING: shift/reduce conflict for DEF in state 107 resolved as shift
-WARNING: shift/reduce conflict for RETURN in state 107 resolved as shift
-WARNING: shift/reduce conflict for BREAK in state 107 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 107 resolved as shift
-WARNING: shift/reduce conflict for NOT in state 107 resolved as shift
-WARNING: shift/reduce conflict for LPAREN in state 107 resolved as shift
-WARNING: shift/reduce conflict for NUMBER in state 107 resolved as shift
-WARNING: shift/reduce conflict for FLOAT in state 107 resolved as shift
-WARNING: shift/reduce conflict for INT in state 107 resolved as shift
-WARNING: shift/reduce conflict for STRING in state 107 resolved as shift
-WARNING: shift/reduce conflict for TRUE in state 107 resolved as shift
-WARNING: shift/reduce conflict for FALSE in state 107 resolved as shift
-WARNING: shift/reduce conflict for ELIF in state 108 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 84 resolved as shift
+WARNING: shift/reduce conflict for NEWLINE in state 94 resolved as shift
+WARNING: shift/reduce conflict for PRINT in state 94 resolved as shift
+WARNING: shift/reduce conflict for ID in state 94 resolved as shift
+WARNING: shift/reduce conflict for IF in state 94 resolved as shift
+WARNING: shift/reduce conflict for WHILE in state 94 resolved as shift
+WARNING: shift/reduce conflict for FOR in state 94 resolved as shift
+WARNING: shift/reduce conflict for DEF in state 94 resolved as shift
+WARNING: shift/reduce conflict for RETURN in state 94 resolved as shift
+WARNING: shift/reduce conflict for BREAK in state 94 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 94 resolved as shift
+WARNING: shift/reduce conflict for NOT in state 94 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 94 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 94 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 94 resolved as shift
+WARNING: shift/reduce conflict for INT in state 94 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 94 resolved as shift
+WARNING: shift/reduce conflict for TRUE in state 94 resolved as shift
+WARNING: shift/reduce conflict for FALSE in state 94 resolved as shift
 WARNING: shift/reduce conflict for PRINT in state 109 resolved as shift
 WARNING: shift/reduce conflict for ID in state 109 resolved as shift
 WARNING: shift/reduce conflict for IF in state 109 resolved as shift
@@ -6998,27 +7044,27 @@ WARNING: shift/reduce conflict for INT in state 109 resolved as shift
 WARNING: shift/reduce conflict for STRING in state 109 resolved as shift
 WARNING: shift/reduce conflict for TRUE in state 109 resolved as shift
 WARNING: shift/reduce conflict for FALSE in state 109 resolved as shift
-WARNING: shift/reduce conflict for ELIF in state 120 resolved as shift
-WARNING: shift/reduce conflict for ELSE in state 121 resolved as shift
-WARNING: shift/reduce conflict for ELSE in state 133 resolved as shift
-WARNING: shift/reduce conflict for PRINT in state 141 resolved as shift
-WARNING: shift/reduce conflict for ID in state 141 resolved as shift
-WARNING: shift/reduce conflict for IF in state 141 resolved as shift
-WARNING: shift/reduce conflict for WHILE in state 141 resolved as shift
-WARNING: shift/reduce conflict for FOR in state 141 resolved as shift
-WARNING: shift/reduce conflict for DEF in state 141 resolved as shift
-WARNING: shift/reduce conflict for RETURN in state 141 resolved as shift
-WARNING: shift/reduce conflict for BREAK in state 141 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 141 resolved as shift
-WARNING: shift/reduce conflict for NOT in state 141 resolved as shift
-WARNING: shift/reduce conflict for LPAREN in state 141 resolved as shift
-WARNING: shift/reduce conflict for NUMBER in state 141 resolved as shift
-WARNING: shift/reduce conflict for FLOAT in state 141 resolved as shift
-WARNING: shift/reduce conflict for INT in state 141 resolved as shift
-WARNING: shift/reduce conflict for STRING in state 141 resolved as shift
-WARNING: shift/reduce conflict for TRUE in state 141 resolved as shift
-WARNING: shift/reduce conflict for FALSE in state 141 resolved as shift
-WARNING: shift/reduce conflict for NEWLINE in state 144 resolved as shift
+WARNING: shift/reduce conflict for ELIF in state 110 resolved as shift
+WARNING: shift/reduce conflict for PRINT in state 111 resolved as shift
+WARNING: shift/reduce conflict for ID in state 111 resolved as shift
+WARNING: shift/reduce conflict for IF in state 111 resolved as shift
+WARNING: shift/reduce conflict for WHILE in state 111 resolved as shift
+WARNING: shift/reduce conflict for FOR in state 111 resolved as shift
+WARNING: shift/reduce conflict for DEF in state 111 resolved as shift
+WARNING: shift/reduce conflict for RETURN in state 111 resolved as shift
+WARNING: shift/reduce conflict for BREAK in state 111 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 111 resolved as shift
+WARNING: shift/reduce conflict for NOT in state 111 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 111 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 111 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 111 resolved as shift
+WARNING: shift/reduce conflict for INT in state 111 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 111 resolved as shift
+WARNING: shift/reduce conflict for TRUE in state 111 resolved as shift
+WARNING: shift/reduce conflict for FALSE in state 111 resolved as shift
+WARNING: shift/reduce conflict for ELIF in state 123 resolved as shift
+WARNING: shift/reduce conflict for ELSE in state 124 resolved as shift
+WARNING: shift/reduce conflict for ELSE in state 136 resolved as shift
 WARNING: shift/reduce conflict for PRINT in state 144 resolved as shift
 WARNING: shift/reduce conflict for ID in state 144 resolved as shift
 WARNING: shift/reduce conflict for IF in state 144 resolved as shift
@@ -7036,24 +7082,7 @@ WARNING: shift/reduce conflict for INT in state 144 resolved as shift
 WARNING: shift/reduce conflict for STRING in state 144 resolved as shift
 WARNING: shift/reduce conflict for TRUE in state 144 resolved as shift
 WARNING: shift/reduce conflict for FALSE in state 144 resolved as shift
-WARNING: shift/reduce conflict for NEWLINE in state 145 resolved as shift
-WARNING: shift/reduce conflict for PRINT in state 145 resolved as shift
-WARNING: shift/reduce conflict for ID in state 145 resolved as shift
-WARNING: shift/reduce conflict for IF in state 145 resolved as shift
-WARNING: shift/reduce conflict for WHILE in state 145 resolved as shift
-WARNING: shift/reduce conflict for FOR in state 145 resolved as shift
-WARNING: shift/reduce conflict for DEF in state 145 resolved as shift
-WARNING: shift/reduce conflict for RETURN in state 145 resolved as shift
-WARNING: shift/reduce conflict for BREAK in state 145 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 145 resolved as shift
-WARNING: shift/reduce conflict for NOT in state 145 resolved as shift
-WARNING: shift/reduce conflict for LPAREN in state 145 resolved as shift
-WARNING: shift/reduce conflict for NUMBER in state 145 resolved as shift
-WARNING: shift/reduce conflict for FLOAT in state 145 resolved as shift
-WARNING: shift/reduce conflict for INT in state 145 resolved as shift
-WARNING: shift/reduce conflict for STRING in state 145 resolved as shift
-WARNING: shift/reduce conflict for TRUE in state 145 resolved as shift
-WARNING: shift/reduce conflict for FALSE in state 145 resolved as shift
+WARNING: shift/reduce conflict for NEWLINE in state 147 resolved as shift
 WARNING: shift/reduce conflict for PRINT in state 147 resolved as shift
 WARNING: shift/reduce conflict for ID in state 147 resolved as shift
 WARNING: shift/reduce conflict for IF in state 147 resolved as shift
@@ -7071,58 +7100,93 @@ WARNING: shift/reduce conflict for INT in state 147 resolved as shift
 WARNING: shift/reduce conflict for STRING in state 147 resolved as shift
 WARNING: shift/reduce conflict for TRUE in state 147 resolved as shift
 WARNING: shift/reduce conflict for FALSE in state 147 resolved as shift
-WARNING: shift/reduce conflict for PRINT in state 149 resolved as shift
-WARNING: shift/reduce conflict for ID in state 149 resolved as shift
-WARNING: shift/reduce conflict for IF in state 149 resolved as shift
-WARNING: shift/reduce conflict for WHILE in state 149 resolved as shift
-WARNING: shift/reduce conflict for FOR in state 149 resolved as shift
-WARNING: shift/reduce conflict for DEF in state 149 resolved as shift
-WARNING: shift/reduce conflict for RETURN in state 149 resolved as shift
-WARNING: shift/reduce conflict for BREAK in state 149 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 149 resolved as shift
-WARNING: shift/reduce conflict for NOT in state 149 resolved as shift
-WARNING: shift/reduce conflict for LPAREN in state 149 resolved as shift
-WARNING: shift/reduce conflict for NUMBER in state 149 resolved as shift
-WARNING: shift/reduce conflict for FLOAT in state 149 resolved as shift
-WARNING: shift/reduce conflict for INT in state 149 resolved as shift
-WARNING: shift/reduce conflict for STRING in state 149 resolved as shift
-WARNING: shift/reduce conflict for TRUE in state 149 resolved as shift
-WARNING: shift/reduce conflict for FALSE in state 149 resolved as shift
-WARNING: shift/reduce conflict for PRINT in state 151 resolved as shift
-WARNING: shift/reduce conflict for ID in state 151 resolved as shift
-WARNING: shift/reduce conflict for IF in state 151 resolved as shift
-WARNING: shift/reduce conflict for WHILE in state 151 resolved as shift
-WARNING: shift/reduce conflict for FOR in state 151 resolved as shift
-WARNING: shift/reduce conflict for DEF in state 151 resolved as shift
-WARNING: shift/reduce conflict for RETURN in state 151 resolved as shift
-WARNING: shift/reduce conflict for BREAK in state 151 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 151 resolved as shift
-WARNING: shift/reduce conflict for NOT in state 151 resolved as shift
-WARNING: shift/reduce conflict for LPAREN in state 151 resolved as shift
-WARNING: shift/reduce conflict for NUMBER in state 151 resolved as shift
-WARNING: shift/reduce conflict for FLOAT in state 151 resolved as shift
-WARNING: shift/reduce conflict for INT in state 151 resolved as shift
-WARNING: shift/reduce conflict for STRING in state 151 resolved as shift
-WARNING: shift/reduce conflict for TRUE in state 151 resolved as shift
-WARNING: shift/reduce conflict for FALSE in state 151 resolved as shift
-WARNING: shift/reduce conflict for ELIF in state 152 resolved as shift
-WARNING: shift/reduce conflict for ELIF in state 156 resolved as shift
-WARNING: shift/reduce conflict for PRINT in state 161 resolved as shift
-WARNING: shift/reduce conflict for ID in state 161 resolved as shift
-WARNING: shift/reduce conflict for IF in state 161 resolved as shift
-WARNING: shift/reduce conflict for WHILE in state 161 resolved as shift
-WARNING: shift/reduce conflict for FOR in state 161 resolved as shift
-WARNING: shift/reduce conflict for DEF in state 161 resolved as shift
-WARNING: shift/reduce conflict for RETURN in state 161 resolved as shift
-WARNING: shift/reduce conflict for BREAK in state 161 resolved as shift
-WARNING: shift/reduce conflict for MINUS in state 161 resolved as shift
-WARNING: shift/reduce conflict for NOT in state 161 resolved as shift
-WARNING: shift/reduce conflict for LPAREN in state 161 resolved as shift
-WARNING: shift/reduce conflict for NUMBER in state 161 resolved as shift
-WARNING: shift/reduce conflict for FLOAT in state 161 resolved as shift
-WARNING: shift/reduce conflict for INT in state 161 resolved as shift
-WARNING: shift/reduce conflict for STRING in state 161 resolved as shift
-WARNING: shift/reduce conflict for TRUE in state 161 resolved as shift
-WARNING: shift/reduce conflict for FALSE in state 161 resolved as shift
+WARNING: shift/reduce conflict for NEWLINE in state 148 resolved as shift
+WARNING: shift/reduce conflict for PRINT in state 148 resolved as shift
+WARNING: shift/reduce conflict for ID in state 148 resolved as shift
+WARNING: shift/reduce conflict for IF in state 148 resolved as shift
+WARNING: shift/reduce conflict for WHILE in state 148 resolved as shift
+WARNING: shift/reduce conflict for FOR in state 148 resolved as shift
+WARNING: shift/reduce conflict for DEF in state 148 resolved as shift
+WARNING: shift/reduce conflict for RETURN in state 148 resolved as shift
+WARNING: shift/reduce conflict for BREAK in state 148 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 148 resolved as shift
+WARNING: shift/reduce conflict for NOT in state 148 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 148 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 148 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 148 resolved as shift
+WARNING: shift/reduce conflict for INT in state 148 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 148 resolved as shift
+WARNING: shift/reduce conflict for TRUE in state 148 resolved as shift
+WARNING: shift/reduce conflict for FALSE in state 148 resolved as shift
+WARNING: shift/reduce conflict for PRINT in state 150 resolved as shift
+WARNING: shift/reduce conflict for ID in state 150 resolved as shift
+WARNING: shift/reduce conflict for IF in state 150 resolved as shift
+WARNING: shift/reduce conflict for WHILE in state 150 resolved as shift
+WARNING: shift/reduce conflict for FOR in state 150 resolved as shift
+WARNING: shift/reduce conflict for DEF in state 150 resolved as shift
+WARNING: shift/reduce conflict for RETURN in state 150 resolved as shift
+WARNING: shift/reduce conflict for BREAK in state 150 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 150 resolved as shift
+WARNING: shift/reduce conflict for NOT in state 150 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 150 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 150 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 150 resolved as shift
+WARNING: shift/reduce conflict for INT in state 150 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 150 resolved as shift
+WARNING: shift/reduce conflict for TRUE in state 150 resolved as shift
+WARNING: shift/reduce conflict for FALSE in state 150 resolved as shift
+WARNING: shift/reduce conflict for PRINT in state 152 resolved as shift
+WARNING: shift/reduce conflict for ID in state 152 resolved as shift
+WARNING: shift/reduce conflict for IF in state 152 resolved as shift
+WARNING: shift/reduce conflict for WHILE in state 152 resolved as shift
+WARNING: shift/reduce conflict for FOR in state 152 resolved as shift
+WARNING: shift/reduce conflict for DEF in state 152 resolved as shift
+WARNING: shift/reduce conflict for RETURN in state 152 resolved as shift
+WARNING: shift/reduce conflict for BREAK in state 152 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 152 resolved as shift
+WARNING: shift/reduce conflict for NOT in state 152 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 152 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 152 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 152 resolved as shift
+WARNING: shift/reduce conflict for INT in state 152 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 152 resolved as shift
+WARNING: shift/reduce conflict for TRUE in state 152 resolved as shift
+WARNING: shift/reduce conflict for FALSE in state 152 resolved as shift
+WARNING: shift/reduce conflict for PRINT in state 154 resolved as shift
+WARNING: shift/reduce conflict for ID in state 154 resolved as shift
+WARNING: shift/reduce conflict for IF in state 154 resolved as shift
+WARNING: shift/reduce conflict for WHILE in state 154 resolved as shift
+WARNING: shift/reduce conflict for FOR in state 154 resolved as shift
+WARNING: shift/reduce conflict for DEF in state 154 resolved as shift
+WARNING: shift/reduce conflict for RETURN in state 154 resolved as shift
+WARNING: shift/reduce conflict for BREAK in state 154 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 154 resolved as shift
+WARNING: shift/reduce conflict for NOT in state 154 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 154 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 154 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 154 resolved as shift
+WARNING: shift/reduce conflict for INT in state 154 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 154 resolved as shift
+WARNING: shift/reduce conflict for TRUE in state 154 resolved as shift
+WARNING: shift/reduce conflict for FALSE in state 154 resolved as shift
+WARNING: shift/reduce conflict for ELIF in state 155 resolved as shift
+WARNING: shift/reduce conflict for ELIF in state 159 resolved as shift
+WARNING: shift/reduce conflict for PRINT in state 164 resolved as shift
+WARNING: shift/reduce conflict for ID in state 164 resolved as shift
+WARNING: shift/reduce conflict for IF in state 164 resolved as shift
+WARNING: shift/reduce conflict for WHILE in state 164 resolved as shift
+WARNING: shift/reduce conflict for FOR in state 164 resolved as shift
+WARNING: shift/reduce conflict for DEF in state 164 resolved as shift
+WARNING: shift/reduce conflict for RETURN in state 164 resolved as shift
+WARNING: shift/reduce conflict for BREAK in state 164 resolved as shift
+WARNING: shift/reduce conflict for MINUS in state 164 resolved as shift
+WARNING: shift/reduce conflict for NOT in state 164 resolved as shift
+WARNING: shift/reduce conflict for LPAREN in state 164 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 164 resolved as shift
+WARNING: shift/reduce conflict for FLOAT in state 164 resolved as shift
+WARNING: shift/reduce conflict for INT in state 164 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 164 resolved as shift
+WARNING: shift/reduce conflict for TRUE in state 164 resolved as shift
+WARNING: shift/reduce conflict for FALSE in state 164 resolved as shift
 WARNING: reduce/reduce conflict in state 3 resolved using rule (statements -> statement)
 WARNING: rejected rule (empty -> <empty>) in state 3

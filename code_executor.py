@@ -1,9 +1,9 @@
 import llvmlite.binding as llvm
 import ctypes
-from ctypes import CFUNCTYPE, c_double, c_int32, c_char_p, POINTER
+from ctypes import CFUNCTYPE, c_int32, c_char_p, POINTER
 from llvmlite import ir
 import platform
-import os
+
 
 
 def execute_ir(ir_code):

@@ -21,6 +21,10 @@ class CodeGenerator:
         printf_ty = ir.FunctionType(ir.IntType(32), [ir.PointerType(ir.IntType(8))], var_arg=True)
         self.printf = ir.Function(self.module, printf_ty, name="printf")
 
+    def declare_exit(self):
+        exit_ty = ir.FunctionType(ir.VoidType(), [])
+        self.exit = ir.Function(self.module, exit_ty, name="exit")
+
     def declare_scanf(self):
         scanf_ty = ir.FunctionType(ir.IntType(32), [ir.PointerType(ir.IntType(8))], var_arg=True)
         self.scanf = ir.Function(self.module, scanf_ty, name="scanf")
@@ -41,20 +45,16 @@ class CodeGenerator:
     def create_string_constant(self, string):
         if string in self.strings:
             return self.strings[string]
-        # Remove quotes if they exist
-        if string.startswith('"') and string.endswith('"'):
-            string = string[1:-1]
         name = f"str_{self.string_counter}"
         self.string_counter += 1
-        # Add null terminator
         string_const = ir.Constant(ir.ArrayType(ir.IntType(8), len(string) + 1),
-                                 bytearray(string.encode('utf8')) + bytearray('\0'.encode('utf8')))
+                                   bytearray(string.encode('utf8')) + b'\0')
         global_string = ir.GlobalVariable(self.module, string_const.type, name=name)
         global_string.global_constant = True
         global_string.initializer = string_const
         self.strings[string] = global_string
         return global_string
-    
+
 
     def generate_code(self, ast):
         """Enhanced code generation with better block handling"""
@@ -85,36 +85,29 @@ class CodeGenerator:
         return None
     
     def visit_print(self, node):
-        """Enhanced print implementation that handles various types of expressions"""
-        _, expr = node
-        
-        if isinstance(expr, str):
-            if expr.startswith('"') and expr.endswith('"'):
+        """Enhanced print implementation to avoid duplicate outputs."""
+        _, args = node
+        format_parts = []
+        value_parts = []
+
+        for arg in args:
+            if isinstance(arg, str) and arg.startswith('"') and arg.endswith('"'):
                 # String literal
-                string_content = expr[1:-1] + '\n'
-                format_str = self.create_string_constant(string_content)
-                format_ptr = self.builder.bitcast(format_str, ir.PointerType(ir.IntType(8)))
-                self.builder.call(self.printf, [format_ptr])
+                format_parts.append(arg[1:-1])  # Remove quotes
             else:
-                # Variable
-                if expr in self.variables:
-                    var_val = self.builder.load(self.variables[expr])
-                    format_str = self.create_string_constant("%.2f\n")
-                    format_ptr = self.builder.bitcast(format_str, ir.PointerType(ir.IntType(8)))
-                    self.builder.call(self.printf, [format_ptr, var_val])
-        elif isinstance(expr, (int, float)):
-            # Direct numeric value
-            format_str = self.create_string_constant("%.2f\n")
-            format_ptr = self.builder.bitcast(format_str, ir.PointerType(ir.IntType(8)))
-            numeric_val = ir.Constant(ir.DoubleType(), float(expr))
-            self.builder.call(self.printf, [format_ptr, numeric_val])
-        else:
-            # Expression
-            format_str = self.create_string_constant("%.2f\n")
-            format_ptr = self.builder.bitcast(format_str, ir.PointerType(ir.IntType(8)))
-            expr_val = self.visit_expression(expr)
-            self.builder.call(self.printf, [format_ptr, expr_val])
-    
+                # Float or variable to print
+                value = self.visit_expression(arg)
+                format_parts.append("%.2f")
+                value_parts.append(value)
+
+        # Combine format parts into a single format string
+        combined_format = " ".join(format_parts) + "\n"
+        format_str = self.create_string_constant(combined_format)
+        format_ptr = self.builder.bitcast(format_str, ir.PointerType(ir.IntType(8)))
+
+        # Call printf with the combined format string and all values
+        self.builder.call(self.printf, [format_ptr, *value_parts])
+
 
     def visit_input(self, node):
         """Generate code for input statements"""
@@ -334,16 +327,13 @@ class CodeGenerator:
         self.builder.position_at_start(merge_bb)
 
 
-
     def visit_expression(self, node):
         """Enhanced expression handling"""
         if isinstance(node, tuple):
             if len(node) == 3:  # Binary operations
-                if node[0] in ['+', '-', '*', '/', '==', '!=', '>', '>=', '<', '<=', '**', '^']:
-                    return self.visit_binop(node)
+                return self.visit_binop(node)
             elif len(node) == 2:  # Unary operations
-                if node[0] in ['-', 'not']:
-                    return self.visit_unary(node)
+                return self.visit_unary(node)
         elif isinstance(node, (int, float)):
             return ir.Constant(ir.DoubleType(), float(node))
         elif isinstance(node, str):
@@ -353,7 +343,7 @@ class CodeGenerator:
                 return ir.Constant(ir.DoubleType(), float(node))
             except ValueError:
                 pass
-        return ir.Constant(ir.DoubleType(), 0.0)
+        return None  # Default return for unresolved expressions
 
     def visit_binop(self, node):
         """Binary operator handling with division by zero check"""
@@ -364,10 +354,10 @@ class CodeGenerator:
             return self.visit_comparison((op, left, right))
         
         # Handle arithmetic operators
+       # Handle arithmetic operators
         left_val = self.visit_expression(left)
         right_val = self.visit_expression(right)
         
-        # Special handling for division
         if op == '/':
             # Create basic blocks for division
             div_check_block = self.main.append_basic_block(name="div_check")
@@ -378,13 +368,13 @@ class CodeGenerator:
             # Branch to division check
             self.builder.branch(div_check_block)
             
-            # Check for division by zero
+            # Division by zero check
             self.builder.position_at_start(div_check_block)
             zero = ir.Constant(ir.DoubleType(), 0.0)
             is_zero = self.builder.fcmp_ordered('==', right_val, zero)
             self.builder.cbranch(is_zero, div_error_block, div_ok_block)
             
-            # Error block
+            # Division error block
             self.builder.position_at_start(div_error_block)
             self.create_error_handling_printf("Error: Division by zero!")
             self.builder.branch(div_continue_block)
@@ -396,35 +386,24 @@ class CodeGenerator:
             
             # Continue block
             self.builder.position_at_start(div_continue_block)
-            
-            # PHI node to merge results or handle error
             phi = self.builder.phi(ir.DoubleType())
             phi.add_incoming(ir.Constant(ir.DoubleType(), 0.0), div_error_block)
             phi.add_incoming(div_result, div_ok_block)
-            
             return phi
         
-        # Other arithmetic operations
+        # Handle other arithmetic operations
         if op == '+':
             return self.builder.fadd(left_val, right_val)
         elif op == '-':
             return self.builder.fsub(left_val, right_val)
         elif op == '*':
             return self.builder.fmul(left_val, right_val)
-        elif op == '**' or op == '^':
-            # Create function type for pow (double precision)
+        elif op in ('**', '^'):
+            # Handle exponentiation
             pow_func_type = ir.FunctionType(ir.DoubleType(), [ir.DoubleType(), ir.DoubleType()])
-            
-            # Add the function to the module if it doesn't exist
-            if 'pow' not in self.module.globals:
-                pow_func = ir.Function(self.module, pow_func_type, 'pow')
-            else:
-                pow_func = self.module.globals['pow']
-            
-            # Call the pow function
+            pow_func = self.module.globals.get('pow') or ir.Function(self.module, pow_func_type, 'pow')
             return self.builder.call(pow_func, [left_val, right_val])
-
-
+        
     def visit_comparison(self, node):
         """Comparison operator handling"""
         op, left_val, right_val = node

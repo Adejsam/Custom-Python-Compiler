@@ -40,7 +40,6 @@ print("Abstract Syntax Tree:")
 print(result)
 
 print("\n")
-print("\n")
 # Perform semantic analysis
 analyzer = SemanticAnalyzer()
 try:
@@ -49,13 +48,11 @@ try:
     print("\nSemantic Analysis Successful")
     
     print("\n")
-    print("\n")
     print("============== Generating Intermediate Representation ==================")
     # Compile the AST to IR
     code_gen = compile_code(result)
     print(code_gen)
 
-    print("\n")
     print("\n")
     print("============== Optimizing Intermediate representation ====================")
     optimizer = CodeOptimizer(code_gen)
@@ -65,9 +62,9 @@ try:
 
 
     print("\n")
-    print("\n")
     print("============== Compilation and Execution Completed ==================")
     # Execute the generated IR
     execute_ir(optimized_ir)
+    print("\n")
 except Exception as e:
     print("\nSemantic Analysis Error:", e)

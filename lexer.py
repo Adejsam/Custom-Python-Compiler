@@ -94,12 +94,9 @@ def t_FSTRING(t):
 
 # Token for regular strings
 def t_STRING(t):
-    r'"([^"\\]*(\\.[^"\\]*)*)?"'
-    if not t.value.endswith('"'):
-        print(f"Warning: Unclosed string at line {t.lineno}")
-        t.lexer.skip(len(t.value))
-        return None
-    t.value = t.value[1:-1]  # Remove surrounding quotes
+    r'"([^"\\]|\\.)*"'  # Matches double-quoted strings with escape sequences
+    # Pass the full quoted string to the parser
+    t.value = t.value  # Keep quotes intact
     return t
 
 # Token for comments (ignored)
@@ -116,10 +113,11 @@ def t_newline(t):
     return t
 
 # Token for multi-line comments
-def t_MULTILINE_COMMENT(t):
+def t_MULTILINE_STRING(t):
     r'"""(.|\n)*?"""'
-    t.lexer.lineno += t.value.count('\n') 
-    return None  # Ignore multi-line comments
+    t.value = t.value[3:-3]  # Remove surrounding triple quotes
+    t.lexer.lineno += t.value.count('\n')  # Adjust line numbers
+    return t
 
 # Ignore spaces and tabs
 t_ignore = ' \t'
@@ -127,10 +125,10 @@ t_ignore = ' \t'
 # Error handling rule
 def t_error(t):
     if t.value[0] == '\n':
-        pass  # Ignore new lines
+        t.lexer.lineno += 1  # Increment line count for new lines
     else:
-        print(f'illegal character {t.value[0]}')
-    t.lexer.skip(1)  # Skip the illegal character
+        print(f"Illegal character '{t.value[0]}' at line {t.lineno}")
+    t.lexer.skip(1)
 
 # Function to build the lexer
 def build_lexer(data):

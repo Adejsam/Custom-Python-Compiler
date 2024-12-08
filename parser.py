@@ -104,15 +104,15 @@ def p_return_stmt(p):
     else:
         p[0] = ('return', None)
 
-# Define a print statement
+# Define a print statement to handle multiple arguments
 def p_print_stmt(p):
-    '''print_stmt : PRINT LPAREN expression RPAREN'''
-    p[0] = ('print', p[3])  # Print the evaluated expression
+    '''print_stmt : PRINT LPAREN print_arguments RPAREN'''
+    p[0] = ('print', p[3])  # Return a tuple with 'print' and the list of arguments
 
+# Define print arguments to support strings, variables, and expressions
 def p_print_arguments(p):
     '''print_arguments : expression
                        | expression COMMA print_arguments'''
-    # This rule handles multiple arguments separated by commas
     if len(p) == 2:
         p[0] = [p[1]]  # Single argument
     else:
@@ -264,7 +264,7 @@ def p_expression_number(p):
 # Define string literals
 def p_expression_string(p):
     '''expression : STRING'''
-    p[0] = p[1]  # Return the string value
+    p[0] = p[1]  # Keep the full string (with quotes) in the AST
 
 # Define boolean literals
 def p_expression_boolean(p):
