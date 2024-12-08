@@ -1,14 +1,8 @@
-import ply.lex as lex
+import ply.lex as lex  # Import the PLY lex module for lexical analysis
 
-# A list of tokens which are always required
-tokens = ('NUMBER', 'ID', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'POWER', 'LPAREN', 'RPAREN', 'EQUALS', 
-          'GREATER', 'COLON', 'LBRACE', 'RBRACE', 'COMMENT', 'NEWLINE', 'LESS', 'GREATER_EQUAL', 
-          'LESS_EQUAL', 'NOT_EQUAL', 'EQUAL_EQUAL', 'COMMA', 'LBRACKET', 'RBRACKET', 'NEW', 
-          'SEMICOLON', 'DOT')
-
-# Reserved words
+# Define reserved words and their corresponding token types
 reserved = { 
-    'if':'IF', 
+    'if': 'IF', 
     'else': 'ELSE', 
     'while': 'WHILE', 
     'return': 'RETURN', 
@@ -32,9 +26,16 @@ reserved = {
     'append': 'APPEND'
 }
 
-tokens += tuple(reserved.values())
+# List of token types, including both custom tokens and reserved words
+tokens = (
+    'NUMBER', 'ID', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'POWER', 
+    'LPAREN', 'RPAREN', 'EQUALS', 'GREATER', 'COLON', 'LBRACE', 
+    'RBRACE', 'COMMENT', 'NEWLINE', 'LESS', 'GREATER_EQUAL', 
+    'LESS_EQUAL', 'NOT_EQUAL', 'EQUAL_EQUAL', 'COMMA', 'LBRACKET', 
+    'RBRACKET', 'NEW', 'SEMICOLON', 'DOT'
+) + tuple(reserved.values())  # Add reserved words to the list of tokens
 
-# Regular expression rules
+# Regular expression rules for simple tokens
 t_POWER = r'\*\*'
 t_PLUS = r'\+'
 t_MINUS = r'-'
@@ -53,41 +54,24 @@ t_LESS_EQUAL = r'<='
 t_NOT_EQUAL = r'!='
 t_SEMICOLON = r';'
 t_EQUAL_EQUAL = r'=='
-t_RETURN = r'return'
-# t_IF = r'if'
-# t_ELSE = r'else'
-# t_ELIF = r'elif'
-# t_IN = r'in'
-t_WHILE = r'while'
-t_FOR = r'for'
-t_TYPE = r'type'
-t_INT = r'int'
-t_FLOAT = r'float'
 t_COMMA = r','
 t_LBRACKET = r'\['
 t_RBRACKET = r'\]'
-t_DEF = r'def'
-t_NEW = r'new'
-t_PRINT = r'print'
-t_RANGE = r'range'
-t_INPUT = r'input'
-t_APPEND = r'append'
 t_DOT = r'\.'
 
-
-# Identifying IDs like variables and reserved words
-def t_ID(t):
+# Token for identifiers (variables and reserved words)
+def t_IDENTIFIER(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = reserved.get(t.value, 'ID')  # Check for reserved words
+    t.type = reserved.get(t.value, 'ID')  # Check if the ID is a reserved word
     return t
 
-# Identifying integer and floating point numbers
+# Token for numbers (integers and floats)
 def t_NUMBER(t):
-    r'\d+(\.\d+)?'  # Matches integers and floats
-    t.value = float(t.value) if '.' in t.value else int(t.value)
+    r'\d+(\.\d+)?'
+    t.value = float(t.value) if '.' in t.value else int(t.value)  # Convert to appropriate type
     return t
 
-# Handling boolean values
+# Token for boolean values
 def t_TRUE(t):
     r'true'
     t.value = True
@@ -98,33 +82,58 @@ def t_FALSE(t):
     t.value = False
     return t
 
-# Handling strings
-def t_STRING(t):
-    r'\"([^\\\"]|\\.)*\"'
+# Token for formatted strings (f-strings)
+def t_FSTRING(t):
+    r'f"([^"\\]*(\\.[^"\\]*)*(\{[^{}]*\}[^"\\]*)*)"'  
+    if not t.value.endswith('"'):
+        print(f"Warning: Unclosed f-string at line {t.lineno}")
+        t.lexer.skip(len(t.value))
+        return None
+    t.value = t.value[2:-1]  # Remove `f` prefix and surrounding quotes
     return t
 
-# For comments to be ignored
+# Token for regular strings
+def t_STRING(t):
+    r'"([^"\\]*(\\.[^"\\]*)*)?"'
+    if not t.value.endswith('"'):
+        print(f"Warning: Unclosed string at line {t.lineno}")
+        t.lexer.skip(len(t.value))
+        return None
+    t.value = t.value[1:-1]  # Remove surrounding quotes
+    return t
+
+# Token for comments (ignored)
 def t_COMMENT(t):
     r'\#.*'
     pass  # Ignore comments
 
-# To track new lines
+# Token for new lines
 def t_newline(t):
-    r'\n+'
-    t.lexer.lineno += len(t.value)
+    r'\n\n'
+    t.lexer.lineno += 2
+    t.value = '\n'
     t.type = 'NEWLINE'
     return t
 
-# Ignoring spaces and tabs
+# Token for multi-line comments
+def t_MULTILINE_COMMENT(t):
+    r'"""(.|\n)*?"""'
+    t.lexer.lineno += t.value.count('\n') 
+    return None  # Ignore multi-line comments
+
+# Ignore spaces and tabs
 t_ignore = ' \t'
 
 # Error handling rule
 def t_error(t):
-    print(f'illegal character {t.value[0]}')
-    t.lexer.skip(1)
+    if t.value[0] == '\n':
+        pass  # Ignore new lines
+    else:
+        print(f'illegal character {t.value[0]}')
+    t.lexer.skip(1)  # Skip the illegal character
 
-# Build the lexer
+# Function to build the lexer
 def build_lexer(data):
-    lexer = lex.lex()
-    lexer.input(data)
-    return lexer
+    lexer = lex.lex()  # Create a lexer instance
+    lexer.input(data)  # Input data to the lexer
+    return lexer  # Return the lexer instance
